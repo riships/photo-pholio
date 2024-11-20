@@ -1,9 +1,15 @@
 import React from 'react'
+import logo from '../Assets/Images/gallery-icon.jpg'
+import style from '../styles/navbar.module.css'
+import { NavLink } from 'react-router-dom'
 
 function Navbar() {
     return (
-        <div>
-            <img src='' alt='Logo Image' />
+        <div className={style.navbar}>
+            <NavLink to={'/'}>
+                <img src={logo} alt='Logo Image' />
+                <span>Photo Pholio</span>
+            </NavLink>
         </div>
     )
 }

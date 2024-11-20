@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Navbar from "./components/Navbar";
+import { Route, Routes } from "react-router-dom";
+import AlbumList from "./components/AlbumList";
 
 function App() {
+  const [albums, setAlbums] = useState([])
+  useEffect(() => {
+    getAlbumsFromDb();
+  }, []);
+
+  function getAlbumsFromDb() {
+    
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-      </header>
-    </div>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<AlbumList albums={albums} />} />
+      </Routes>
+    </>
   );
 }
 
