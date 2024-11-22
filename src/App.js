@@ -3,10 +3,11 @@ import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import AlbumList from "./components/AlbumList";
 import { db } from "./firebaseInit";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 
 function App() {
   const [albums, setAlbums] = useState([])
+
   useEffect(() => {
     getAlbumsFromDb();
   }, []);
@@ -25,9 +26,13 @@ function App() {
 
 
   async function albumSubmitedData(title) {
-    let docRef = collection(db, 'albums')
-    await addDoc(docRef, { title: title })
+    let docRef = await addDoc(collection(db, 'albums'), { title: title })
+    onSnapshot(doc(db, 'albums', docRef.id), (snapshot) => {
+      setAlbums([...albums, { id: snapshot.id, ...snapshot.data() }])
+    });
   }
+
+
   return (
     <>
       <Navbar />
