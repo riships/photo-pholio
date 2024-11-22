@@ -4,8 +4,10 @@ import folderLogo from '../Assets/Images/folder-logo.png'
 import AlbumForm from './AlbumForm'
 import style from '../styles/album.module.css'
 
-function AlbumList({ albums, albumSubmitedData }) {
+function AlbumList({ albums, albumSubmitedData, getAlbumId }) {
     const [formVisibility, setFormVisibility] = useState(false)
+    const [imgCompo, setImgCompo] = useState('');
+
     return (
         <>
 
@@ -27,7 +29,7 @@ function AlbumList({ albums, albumSubmitedData }) {
                     {
                         albums.map((album) => {
                             return (
-                                <Col key={album.id} md={3} sm={4} xs={6}>
+                                <Col key={album.id} md={3} sm={4} xs={6} onClick={() => getAlbumId(album.id)}>
                                     <div className={`d-flex flex-column align-item-center ${style.album}`}>
                                         <img src={folderLogo} alt='album img logo' className='img-fluid p-4' />
                                         <p className='text-black text-center fs-4 fw-bold'>{album.title}</p>
