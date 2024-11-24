@@ -12,7 +12,7 @@ function ImageForm() {
                             <Form.Control
                                 type="text"
                                 placeholder="Enter Album Name"
-                                className="me-2"
+                                className="me-2 mb-3"
                                 style={{ flex: '1' }} // Optional, for responsive width
                             />
 

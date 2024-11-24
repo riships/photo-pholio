@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
-import { Route, Routes } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AlbumList from "./components/AlbumList";
 import { db } from "./firebaseInit";
-import { addDoc, collection, doc, getDocs, onSnapshot, query, where } from "firebase/firestore";
-import ImageForm from "./components/ImageForm";
+import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 
 function App() {
   const [albums, setAlbums] = useState([])
+
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: (
+        <>
+          <Navbar />
+          <AlbumList albumSubmitedData={albumSubmitedData} albums={albums} />
+        </>
+      )
+    }
+  ])
 
   useEffect(() => {
     getAlbumsFromDb();
@@ -37,10 +48,7 @@ function App() {
 
   return (
     <>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<AlbumList albumSubmitedData={albumSubmitedData} albums={albums} />} />
-      </Routes>
+      <RouterProvider router={router} />
     </>
   );
 }
