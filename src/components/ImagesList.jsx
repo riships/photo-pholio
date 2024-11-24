@@ -3,7 +3,13 @@ import ImageForm from './ImageForm'
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseInit';
 import { Button, Col } from 'react-bootstrap';
-import ImageGalleryComponent from './ImageGalleryComponent';
+
+import LightGallery from 'lightgallery/react';
+import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import lgZoom from 'lightgallery/plugins/zoom';
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-zoom.css';
+import 'lightgallery/css/lg-thumbnail.css';
 
 function ImagesList({ selectedAlbumId }) {
     const [formVisibility, setFormVisibility] = useState(false);
@@ -42,6 +48,10 @@ function ImagesList({ selectedAlbumId }) {
         getAlbumById(selectedAlbumId)
     }, [selectedAlbumId])
 
+    const onInit = () => {
+        console.log('lightGallery has been initialized');
+    };
+
     return (
         <>
             {formVisibility && <ImageForm />}
@@ -54,7 +64,26 @@ function ImagesList({ selectedAlbumId }) {
                     type='button'>{formVisibility ? 'Cancel' : 'Add Image'}
                 </Button>
             </Col>
-            <ImageGalleryComponent imagesList={imagesList} />
+            <div className="App">
+
+                {
+                    imagesList.map((item, index) => {
+                        const { url, id, title } = item
+                        return (
+                            <LightGallery
+                                onInit={onInit}
+                                speed={500}
+                                plugins={[lgThumbnail, lgZoom]}
+                            >
+                                <a key={id} href={url}>
+                                    <img alt={title} src={url} />
+                                </a>
+                            </LightGallery>
+
+                        )
+                    })
+                }
+            </div>
         </>
     )
 }
