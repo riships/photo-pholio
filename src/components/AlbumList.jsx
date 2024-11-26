@@ -8,10 +8,14 @@ import ImagesList from './ImagesList'
 function AlbumList({ albums, albumSubmitedData }) {
     const [formVisibility, setFormVisibility] = useState(false)
     const [selectedAlbumId, setSelectedAlbumId] = useState(null);
+    const [albumName, setAlbumName] = useState('');
 
-    const handleAlbumClick = (albumId) => {
+    const handleAlbumClick = (albumId, name) => {
         if (albumId) {
             setSelectedAlbumId(albumId);
+        }
+        if (name) {
+            setAlbumName(name)
         }
     }
 
@@ -22,7 +26,7 @@ function AlbumList({ albums, albumSubmitedData }) {
                 {selectedAlbumId ?
                     (
                         <Row>
-                            <ImagesList selectedAlbumId={selectedAlbumId} />
+                            <ImagesList albumName={albumName} selectedAlbumId={selectedAlbumId} />
                         </Row>
                     ) : (
                         <Row>
@@ -42,7 +46,7 @@ function AlbumList({ albums, albumSubmitedData }) {
                             {
                                 albums.map((album) => {
                                     return (
-                                        <Col key={album.id} md={3} sm={4} xs={6} onClick={() => handleAlbumClick(album.id)}>
+                                        <Col key={album.id} md={3} sm={4} xs={6} onClick={() => handleAlbumClick(album.id, album.title)}>
                                             <div className={`d-flex flex-column align-item-center ${style.album}`}>
                                                 <img src={folderLogo} alt='album img logo' className='img-fluid p-4' />
                                                 <p className='text-black text-center fs-4 fw-bold'>{album.title}</p>

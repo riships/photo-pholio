@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ImageForm from './ImageForm'
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebaseInit';
 import { Button, Col } from 'react-bootstrap';
+import ImageViewer from 'react-simple-image-viewer';
 
-import LightGallery from 'lightgallery/react';
-import lgThumbnail from 'lightgallery/plugins/thumbnail';
-import lgZoom from 'lightgallery/plugins/zoom';
-import 'lightgallery/css/lightgallery.css';
-import 'lightgallery/css/lg-zoom.css';
-import 'lightgallery/css/lg-thumbnail.css';
 
-function ImagesList({ selectedAlbumId }) {
+function ImagesList({ selectedAlbumId, albumName }) {
     const [formVisibility, setFormVisibility] = useState(false);
     const [imagesList, setImagesList] = useState([]);
+    const [currentImage, setCurrentImage] = useState(0);
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
 
     async function getAlbumById(selectedAlbumId) {
         try {
@@ -42,19 +39,28 @@ function ImagesList({ selectedAlbumId }) {
             console.error('Error fetching albums:', error);
         }
     }
+    const openImageViewer = useCallback((index) => {
+        setCurrentImage(index);
+        setIsViewerOpen(true);
+    }, []);
 
+    const closeImageViewer = () => {
+        setCurrentImage(0);
+        setIsViewerOpen(false);
+    };
 
     useEffect(() => {
         getAlbumById(selectedAlbumId)
     }, [selectedAlbumId])
 
-    const onInit = () => {
-        console.log('lightGallery has been initialized');
-    };
+
+    const imageUrls = imagesList.map((image) => image.url);
+
+
 
     return (
         <>
-            {formVisibility && <ImageForm />}
+            {formVisibility && <ImageForm id={selectedAlbumId} name={albumName} />}
             <Col md={6} sm={6} className='text-start'>
                 <h3 className='ps-4 my-3'>Your Image</h3>
             </Col>
@@ -64,26 +70,32 @@ function ImagesList({ selectedAlbumId }) {
                     type='button'>{formVisibility ? 'Cancel' : 'Add Image'}
                 </Button>
             </Col>
-            <div className="App">
-
-                {
-                    imagesList.map((item, index) => {
-                        const { url, id, title } = item
-                        return (
-                            <LightGallery
-                                onInit={onInit}
-                                speed={500}
-                                plugins={[lgThumbnail, lgZoom]}
-                            >
-                                <a key={id} href={url}>
-                                    <img alt={title} src={url} />
-                                </a>
-                            </LightGallery>
-
-                        )
-                    })
-                }
-            </div>
+            {imagesList.map((image, index) => {
+                const { id, url, title } = image
+                return (
+                    <Col md={6} sm={6}>
+                        <img key={id}
+                            src={url}
+                            onClick={() => openImageViewer(index)}
+                            width="300" s
+                            style={{ margin: '2px' }}
+                            alt={title}
+                        />
+                    </Col>
+                )
+            }
+            )}
+            {
+                isViewerOpen && (
+                    <ImageViewer
+                        src={imageUrls}
+                        currentIndex={currentImage}
+                        disableScroll={false}
+                        closeOnClickOutside={true}
+                        onClose={closeImageViewer}
+                    />
+                )
+            }
         </>
     )
 }
