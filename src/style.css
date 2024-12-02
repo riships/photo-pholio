@@ -23,9 +23,10 @@
     width: 30px;
 }
 
-a{
-    text-decoration: none;
+a {
+    text-decoration: none !important;
 }
-a:hover{
-    text-decoration: none;
+
+a:hover {
+    text-decoration: none !important;
 }

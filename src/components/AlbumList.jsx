@@ -31,16 +31,6 @@ function AlbumList({ albumSubmitedData }) {
 
         setAlbums([...albums, ...newAlbums]); // Spread existing albums and new ones
         setLoading(false)
-        toast.success('Album Loaded Successfullly.', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        })
     }
 
 

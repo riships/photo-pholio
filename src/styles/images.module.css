@@ -1,0 +1,22 @@
+.buttons_parents {
+    position: relative;
+}
+
+.buttons_child {
+    position: absolute;
+    right: 0;
+    top: -25px;
+    display: none;
+}
+
+.buttons_child button:first-child {
+    color: blue;
+}
+
+.buttons_child button:last-child {
+    color: red;
+}
+
+.buttons_parents:hover .buttons_child {
+    display: block;
+}
