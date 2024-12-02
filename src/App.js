@@ -1,10 +1,11 @@
 import React from "react";
 import Navbar from "./components/Navbar";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import AlbumList from "./components/AlbumList";
+import ImagesList from "./components/ImagesList";
 
 function App() {
-  
+
 
   const router = createBrowserRouter([
     {
@@ -12,9 +13,19 @@ function App() {
       element: (
         <>
           <Navbar />
-          <AlbumList />
+          <Outlet />
         </>
-      )
+      ),
+      children: [
+        {
+          index: true,
+          element: <AlbumList />,
+        },
+        {
+          path: ':albumId',
+          element: <ImagesList />
+        }
+      ]
     }
   ])
 

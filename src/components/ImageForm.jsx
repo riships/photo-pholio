@@ -2,6 +2,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import React, { useRef } from 'react';
 import { Button, Col, Form } from 'react-bootstrap';
 import { db } from '../firebaseInit';
+import { toast } from 'react-toastify';
 
 function ImageForm({ name, id }) {
     const imgUrl = useRef(null);
@@ -13,6 +14,16 @@ function ImageForm({ name, id }) {
         let title = imgName.current?.value || ''
 
         await addDoc(collection(db, 'gallery'), { albumId: id, title: title, url: url })
+        toast.success('Image added Successfullly.', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+        })
         clearForm()
     }
 

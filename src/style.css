@@ -4,3 +4,28 @@
     box-sizing: border-box;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
+
+
+.back_icon {
+    align-items: center;
+    aspect-ratio: 1;
+    background-color: #fcfcfc;
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .24);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    margin-right: 30px;
+    width: 50px
+}
+
+.back_icon img {
+    width: 30px;
+}
+
+a{
+    text-decoration: none;
+}
+a:hover{
+    text-decoration: none;
+}
