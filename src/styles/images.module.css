@@ -10,11 +10,33 @@
 }
 
 .buttons_child button:first-child {
-    color: blue;
+    background-color: #4caf50;
+    /* Green */
+    color: white;
+    border: none;
+    padding: 5;
+    font-size: 12px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.buttons_child button:first-child:hover {
+    background-color: #45a049;
 }
 
 .buttons_child button:last-child {
-    color: red;
+    background-color: #f44336;
+    /* Red */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.buttons_child button:last-child:hover {
+    background-color: #e53935;
 }
 
 .buttons_parents:hover .buttons_child {

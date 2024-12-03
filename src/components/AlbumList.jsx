@@ -4,41 +4,34 @@ import folderLogo from '../Assets/Images/folder-logo.png'
 import AlbumForm from './AlbumForm'
 import style from '../styles/album.module.css'
 import { db } from '../firebaseInit'
-import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot } from "firebase/firestore";
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from 'react-spinner-material'
 import { Link } from 'react-router-dom'
 
-function AlbumList({ albumSubmitedData }) {
+function AlbumList() {
     const [formVisibility, setFormVisibility] = useState(false)
     const [albums, setAlbums] = useState([]);
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        getAlbumsFromDb();
-    }, []);
-
-
-    async function getAlbumsFromDb() {
-        setLoading(true)
-        let albumsData = await getDocs(collection(db, 'albums'));
-        const newAlbums = [];
-
-        albumsData.forEach((doc) => {
-            newAlbums.push({ id: doc.id, ...doc.data() });
+        setLoading(true);
+        const unsubscribe = onSnapshot(collection(db, 'albums'), (snapshot) => {
+            const albumsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setAlbums(albumsData);
+            setLoading(false);
         });
 
-        setAlbums([...albums, ...newAlbums]); // Spread existing albums and new ones
-        setLoading(false)
-    }
+        return () => unsubscribe(); // Clean up subscription
+    }, [])
+
 
 
     async function albumSubmitedData(title) {
         let docRef = await addDoc(collection(db, 'albums'), { title: title })
         onSnapshot(doc(db, 'albums', docRef.id), (snapshot) => {
             setAlbums((prevAlbums) => [...prevAlbums, { id: snapshot.id, ...snapshot.data() }]);
-
         });
 
         toast.success('Album added Successfullly.', {
@@ -73,7 +66,9 @@ function AlbumList({ albumSubmitedData }) {
                     </Col>
                     {loading ?
                         <Col md={12} sm={12}>
-                            <Spinner className='mx-auto' animation='border' />
+                            <Spinner animation="border" role="status" className='mx-auto'>
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
                         </Col>
                         :
                         albums.map((album) => {

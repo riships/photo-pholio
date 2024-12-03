@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import ImageForm from './ImageForm'
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../firebaseInit';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import ImageViewer from 'react-simple-image-viewer';
 import { Link, useParams } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import backImg from '../Assets/Images/back.png'
 import Spinner from 'react-spinner-material';
 import { FaPencilAlt } from 'react-icons/fa';
@@ -18,8 +18,9 @@ function ImagesList() {
     const [imagesList, setImagesList] = useState([]);
     const [currentImage, setCurrentImage] = useState(0);
     const [isViewerOpen, setIsViewerOpen] = useState(false);
-    const [albumName, setAlbumName] = useState('')
     const [loading, setLoading] = useState(false)
+    const [isEdit, setIsEdit] = useState(false)
+    const [editData, setEditData] = useState([])
 
     const { albumId } = useParams();
 
@@ -39,7 +40,7 @@ function ImagesList() {
 
             // Iterate through the results and log each document's data
             querySnapshot.forEach((doc) => {
-                galleryData.push({ id: albumId, ...doc.data() })
+                galleryData.push({ id: doc.id, albumId: albumId, ...doc.data() })
             });
 
             if (querySnapshot.empty) {
@@ -51,6 +52,75 @@ function ImagesList() {
         } catch (error) {
             console.error('Error fetching albums:', error);
         }
+    }
+
+    async function handleImageAdd({ id, url, title, albumId }) {
+        if (!isEdit) {
+            const docRef = await addDoc(collection(db, 'gallery'), { albumId: albumId, title: title, url: url })
+            onSnapshot(doc(db, 'gallery', docRef.id), (snapshot) => {
+                setImagesList((prevImages) => [...prevImages, { id: snapshot.id, ...snapshot.data() }]);
+            });
+        } else {
+            try {
+                // Update existing document
+                await updateDoc(doc(db, 'gallery', id), { albumId, title, url });
+
+                // Listen for real-time updates
+                onSnapshot(doc(db, 'gallery', id), (snapshot) => {
+                    if (snapshot.exists()) {
+                        setImagesList((prevImages) =>
+                            prevImages.map((image) =>
+                                image.id === snapshot.id
+                                    ? { id: snapshot.id, ...snapshot.data() }
+                                    : image
+                            )
+                        );
+                    } else {
+                        console.warn('Document does not exist for real-time updates');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error updating document:', error);
+            }
+        }
+    }
+
+    async function handleDelete(id) {
+        const confirmDelete = window.confirm("Are you sure you want to delete this Image?");
+        if (confirmDelete) {
+            try {
+                await deleteDoc(doc(db, 'gallery', id));
+                toast.success('Image deleted successfully!', {
+                    position: 'top-right',
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: 'light',
+                });
+            } catch (error) {
+                toast.error('Failed to delete Image.');
+            }
+            getAlbumById(albumId)
+        }
+    }
+    function handleEdit(id) {
+        if (id) {
+            setIsEdit(true)
+        }
+        let data = imagesList.filter((img) => img.id === id)
+        setEditData(data)
+        setFormVisibility(true)
+    }
+
+
+    async function handleImageUpdation(data) {
+        const docRef = await addDoc(collection(db, 'gallery'),)
+        onSnapshot(doc(db, 'gallery', docRef.id), (snapshot) => {
+            setImagesList((prevImages) => [...prevImages, { id: snapshot.id, ...snapshot.data() }]);
+        });
     }
     const openImageViewer = useCallback((index) => {
         setCurrentImage(index);
@@ -74,11 +144,21 @@ function ImagesList() {
             <Container>
                 <ToastContainer />
                 <Row>
-                    {formVisibility && <ImageForm id={albumId} name={albumName} />}
+                    {formVisibility &&
+                        <ImageForm
+                            handleImageUpdation={handleImageUpdation}
+                            editData={editData}
+                            isEdit={isEdit}
+                            handleImageAdd={handleImageAdd}
+                            setIsEdit={setIsEdit}
+                            setFormVisibility={setFormVisibility}
+                            id={albumId} />
+                    }
+
                     <Col md={6} sm={6} xs={9} className='text-start my-4'>
                         <div className='d-flex align-items-center'>
                             <Link to='/'>
-                                <span className='back_icon'><img src={backImg} /></span>
+                                <span className='back_icon'><img src={backImg} alt='icon' /></span>
                             </Link>
                             <h3 className='ps-4 my-3'>Images in this album</h3>
                         </div>
@@ -101,8 +181,8 @@ function ImagesList() {
                                     <Col md={3} sm={4} key={id}>
                                         <div className={styles.buttons_parents}>
                                             <div className={styles.buttons_child}>
-                                                <button className='btn fs-4' type='button'><FaPencilAlt /></button>
-                                                <button className='btn fs-4' type='button'><RiDeleteBin6Line /></button>
+                                                <button className='btn fs-5' type='button' onClick={() => handleEdit(id)}><FaPencilAlt /></button>
+                                                <button className='btn fs-5' type='button' onClick={() => handleDelete(id)}><RiDeleteBin6Line /></button>
                                             </div>
                                             <img
                                                 src={url}
@@ -131,7 +211,7 @@ function ImagesList() {
                         )
                     }
                 </Row>
-            </Container>
+            </Container >
         </>
     )
 }

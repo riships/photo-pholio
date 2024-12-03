@@ -7,7 +7,7 @@ function Navbar() {
     return (
         <div className={style.navbar}>
             <NavLink to={'/'}>
-                <img src={logo} alt='Logo Image' />
+                <img src={logo} alt='Logo' />
                 <span className='text-white'>Photo Pholio</span>
             </NavLink>
         </div>
